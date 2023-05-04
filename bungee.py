@@ -238,6 +238,12 @@ failed_wallets = []
 clear()
 print ('Вы отправляете из сети', from_network, 'в сеть', to, amount, currency[from_network],'\nТранзакция придёт в нативной валюте сети в которую вы отправляете\n')
 
+print('CONFIG:\n')
+if randomize == 1:
+    print ('Кошельки перемешаны: Да\n')
+else:
+    print ('Кошельки перемешаны: Нет\n')
+print('Количество транзакций на каждом кошельке:', count, '\n')
 
 print('Пожалуйста, проверьте чтобы на всех ваших аккаунтов был достаточный баланс для отправки и оплаты комиссии!\nВведите Y чтобы начать или что-угодно другое чтобы отменить')
 if str(input()).lower() == 'y':
@@ -249,14 +255,15 @@ if str(input()).lower() == 'y':
             shuffle(wallets)
         for wallet in wallets:
             index = wallets_sample.index(wallet) + 1
-            tx_hash = send_trx(wallet, index)
-
-            if tx_hash != 0:
-                print('Успешно провёл транзакцию. Номер кошелька:', index, '. Хэш транзакции:', web3.to_hex(tx_hash))
-            else:
-                failed_wallets.append(wallet)
-
-            sleep(delay)
+            for i in range(count):
+                tx_hash = send_trx(wallet, index)
+                if tx_hash != 0:
+                    print('Успешно провёл транзакцию. Номер кошелька:', index, '. Хэш транзакции:', web3.to_hex(tx_hash))
+                else:
+                    failed_wallets.append(wallet)
+                    print('Прекращаю транзакции на кошельке номер:', index)
+                    break
+                sleep(delay)
 else:
     print('Отменено.')
     
